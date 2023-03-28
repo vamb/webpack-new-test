@@ -4,8 +4,11 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 
 module.exports = {
   mode: 'development',
-  entry: './src/index.js',
+  entry: './src/index.tsx',
   devtool: 'inline-source-map',
+  resolve: {
+    extensions: ['.js', '.jsx', '.ts', '.tsx'],
+  },
   module: {
     rules: [
       {
@@ -14,6 +17,34 @@ module.exports = {
           loader: 'babel-loader',
           options: { presets: ['@babel/preset-typescript'] }
         }
+      },
+      {
+        test: /\.jsx$/, // 处理并转义 jsx react代码
+        loader: "babel-loader",
+        options: {
+          presets: [
+            [
+              "@babel/preset-react", {
+              "runtime": "automatic" // 将 import React from "react" 自动帮我们注入运行时代码
+            }
+            ]
+          ],
+        }
+      },
+      {
+        test: /\.tsx$/, // 对typescript文件的兼容转义
+        use: 'ts-loader',
+        // loader: 'babel-loader',
+        // options: {
+        //   'presets': [
+        //     [
+        //       "@babel/preset-react", {
+        //         "runtime": "automatic"
+        //       }
+        //     ],
+        //     '@babel/preset-typescript'
+        //   ]
+        // }
       },
       // {
       //   test: /\.css$/i,
@@ -35,6 +66,13 @@ module.exports = {
       //     "postcss-loader"
       //   ]
       // },
+      /**
+       * PostCSS 最大的优势在于其简单、易用、丰富的插件生态，基本上已经能够覆盖样式开发的方方面面。实践中，经常使用的插件有：
+       *    autoprefixer：基于 Can I Use 网站上的数据，自动添加浏览器前缀
+       *    postcss-preset-env：一款将最新 CSS 语言特性转译为兼容性更佳的低版本代码的插件
+       *    postcss-less：兼容 Less 语法的 PostCSS 插件，类似的还有：postcss-sass、poststylus
+       *    stylelint：一个现代 CSS 代码风格检查器，能够帮助识别样式代码中的异常或风格问题
+       */
       {
         test: /\.css$/, //兼容 postcss 和普通 css 的转义 - v2
         use: [
@@ -111,14 +149,11 @@ module.exports = {
           "stylus-loader"
         ],
       },
-      /**
-       * PostCSS 最大的优势在于其简单、易用、丰富的插件生态，基本上已经能够覆盖样式开发的方方面面。实践中，经常使用的插件有：
-       *    autoprefixer：基于 Can I Use 网站上的数据，自动添加浏览器前缀
-       *    postcss-preset-env：一款将最新 CSS 语言特性转译为兼容性更佳的低版本代码的插件
-       *    postcss-less：兼容 Less 语法的 PostCSS 插件，类似的还有：postcss-sass、poststylus
-       *    stylelint：一个现代 CSS 代码风格检查器，能够帮助识别样式代码中的异常或风格问题
-       */
     ]
+  },
+  devServer: {
+    hot: true,
+    open: true
   },
   plugins: [
     new MiniCssExtractPlugin(),
