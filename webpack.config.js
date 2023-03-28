@@ -24,16 +24,100 @@ module.exports = {
        * 1. JS、CSS 资源无法并行加载，从而降低页面性能；
        * 2. 资源缓存粒度变大，JS、CSS 任意一种变更都会致使缓存失效。
        */
+      // {
+      //   test: /\.css$/, //兼容 postcss 和普通 css 的转义 - v1
+      //   use: [
+      //     // 根据运行环境判断使用那个 loader
+      //     (process.env.NODE_ENV === 'development' ?
+      //       'style-loader' :
+      //       MiniCssExtractPlugin.loader),
+      //     'css-loader',
+      //     "postcss-loader"
+      //   ]
+      // },
       {
-        test: /\.css$/,
+        test: /\.css$/, //兼容 postcss 和普通 css 的转义 - v2
         use: [
           // 根据运行环境判断使用那个 loader
           (process.env.NODE_ENV === 'development' ?
             'style-loader' :
             MiniCssExtractPlugin.loader),
-          'css-loader'
+          {
+            loader: "css-loader",
+            options: {
+              importLoaders: 1
+            }
+          },
+          // {
+          //   loader: "postcss-loader",
+          //   options: {
+          //     postcssOptions: {
+          //       // 添加 autoprefixer 插件
+          //       plugins: [require("autoprefixer")], // 可为 CSS 代码自动添加浏览器前缀
+          //     },
+          //   },
+          // }
+          "postcss-loader" // - v3 相关配置 被移到了postcss.config.js里面 --- PostCSS 与预处理器并非互斥关系，我们完全可以在同一个项目中同时使用两者
         ]
-      }
+      },
+      {
+        test: /\.less$/, //兼容 less 的转义
+        use: [
+          // 根据运行环境判断使用那个 loader
+          (process.env.NODE_ENV === 'development' ?
+            'style-loader' :
+            MiniCssExtractPlugin.loader),
+          {
+            loader: "css-loader",
+            options: {
+              importLoaders: 1
+            }
+          },
+          "postcss-loader",
+          'less-loader'
+        ]
+      },
+      {
+        test: /\.s[ac]ss$/, //兼容 sass 的转义
+        use: [
+          // 根据运行环境判断使用那个 loader
+          (process.env.NODE_ENV === 'development' ?
+            'style-loader' :
+            MiniCssExtractPlugin.loader),
+          {
+            loader: "css-loader",
+            options: {
+              importLoaders: 1
+            }
+          },
+          "postcss-loader",
+          "sass-loader"
+        ],
+      },
+      {
+        test: /\.styl$/, //兼容 stylus 的转义
+        use: [
+          // 根据运行环境判断使用那个 loader
+          (process.env.NODE_ENV === 'development' ?
+            'style-loader' :
+            MiniCssExtractPlugin.loader),
+          {
+            loader: "css-loader",
+            options: {
+              importLoaders: 1
+            }
+          },
+          "postcss-loader",
+          "stylus-loader"
+        ],
+      },
+      /**
+       * PostCSS 最大的优势在于其简单、易用、丰富的插件生态，基本上已经能够覆盖样式开发的方方面面。实践中，经常使用的插件有：
+       *    autoprefixer：基于 Can I Use 网站上的数据，自动添加浏览器前缀
+       *    postcss-preset-env：一款将最新 CSS 语言特性转译为兼容性更佳的低版本代码的插件
+       *    postcss-less：兼容 Less 语法的 PostCSS 插件，类似的还有：postcss-sass、poststylus
+       *    stylelint：一个现代 CSS 代码风格检查器，能够帮助识别样式代码中的异常或风格问题
+       */
     ]
   },
   plugins: [
