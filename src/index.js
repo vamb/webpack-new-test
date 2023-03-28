@@ -1,11 +1,9 @@
-const say = (statements) => {
-
-  console.log(statements)
-
-};
+import './test.css';
 
 
 
-// @ts-ignore
+const node = document.createElement('span');
 
-say("Tecvan");
+node.textContent = 'Hello world';
+
+document.body.appendChild(node);
